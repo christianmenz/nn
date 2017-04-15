@@ -32,28 +32,31 @@
                     <form class="ui form">
                         <div class="field">
                             <label>Learning rate</label>
-                            <input type="text"  placeholder="Learning rate" ng-model="app.configuration.learningRate">
+                            <input type="text"  placeholder="Learning rate" ng-model="app.network.learningRate">
                         </div>
                         <div class="field">
                             <label>Activation</label>
-                            <input type="text" placeholder="Activation" ng-model="app.configuration.activation">
+                            <select class="ui dropdown" placeholder="Activation" ng-model="app.network.activation" ng-options="activation for activation in app.configuration.activations">                               
+                            </select>
                         </div>
                         <div class="field">
-                            <label>Optimization algorithm</label>
-                            <input type="text" placeholder="Optimization algorithm" ng-model="app.configuration.optimizationAlgo">
+                            <label>Optimization algorithm</label>                            
+                            <select class="ui dropdown" placeholder="Optimization algorithm" ng-model="app.network.optimizationAlgo" ng-options="optAlgo for optAlgo in app.configuration.optimizationAlgos">                               
+                            </select>
                         </div>
                         <div class="field">
                             <label>Updater</label>
-                            <input type="text" placeholder="Updater" ng-model="app.configuration.updater">
+                            <select class="ui dropdown" placeholder="Updater" ng-model="app.network.updater" ng-options="updater for updater in app.configuration.updaters">
+                            </select>                            
                         </div>
                         <div class="field">
                             <label>Momentum</label>
-                            <input type="text" placeholder="Momentum" ng-model="app.configuration.momentum">
+                            <input type="text" placeholder="Momentum" ng-model="app.network.momentum">
                         </div>
                         <div class="field">
                             <label>Loss function</label>
-                            <select class="ui dropdown" placeholder="Loss function" ng-model="app.configuration.lossFunction" ng-options="lossFunction for lossFunction in app.lossFunctions">
-                            </select>
+                            <select class="ui dropdown" placeholder="Loss function" ng-model="app.network.lossFunction" ng-options="lossFunction for lossFunction in app.configuration.lossFunctions">
+                            </select>                            
                         </div>
 
 
