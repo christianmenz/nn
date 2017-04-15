@@ -61,7 +61,8 @@
                     </div>
                 </div>
 
-                <div class="row">
+                <!-- Step 0 -->
+                <div class="row" ng-if="app.state === 0">
                     <form class="ui form">
                         <div class="field">
                             <label>Learning rate</label>
@@ -101,8 +102,14 @@
                         <button class="ui button" type="button" ng-click="app.createNetwork()">Create network</button>
                     </form>
                 </div>
-                <div class="row">
-
+                <!-- Step 1-->
+                <div class="row" ng-if="app.app.state === 1">
+                </div>
+                <!-- Step 2 -->
+                <div class="row" ng-if="app.app.state === 2">
+                </div>
+                <!-- Step 3 -->
+                <div class="row" ng-if="app.app.state === 3">
                 </div>
             </div>
         </div>
