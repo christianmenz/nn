@@ -21,18 +21,56 @@
                 <h1 class="ui inverted header">
                     Neural Network Image Filter
                 </h1>
-                <h2>create your own neural network powered image filter.</h2>
+                <h2>create your own neural network powered image filter</h2>
                 <div class="ui huge primary button">Get Started <i class="right arrow icon"></i></div>
             </div>
         </div>  
 
-        <div class="ui vertical stripe segment">
-            <div class="ui middle aligned stackable grid container">
+
+
+        <div class="ui vertical segment">
+
+            <div class="ui middle aligned stackable grid container ">
+
+                <div class="row">
+                    <div class="ui ordered steps">
+                        <div class="step" ng-class="{'completed': app.state > 0, 'active': app.state === 0}">
+                            <div class="content">
+                                <div class="title">Network configuration</div>
+                                <div class="description">Define network parameters</div>
+                            </div>
+                        </div>
+                        <div class="step" ng-class="{'completed': app.state > 1, 'active': app.state === 1}">
+                            <div class="content">
+                                <div class="title">Training data</div>
+                                <div class="description">Setup traing data</div>
+                            </div>
+                        </div>
+                        <div class="step" ng-class="{'completed': app.state > 2, 'active': app.state === 2}">
+                            <div class="content">
+                                <div class="title">Training</div>
+                                <div class="description">Train the network</div>
+                            </div>
+                        </div>
+                        <div class="step" ng-class="{'completed': app.state > 3, 'active': app.state === 3}">
+                            <div class="content">
+                                <div class="title">Test</div>
+                                <div class="description">Apply the image filter</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="row">
                     <form class="ui form">
                         <div class="field">
                             <label>Learning rate</label>
                             <input type="text"  placeholder="Learning rate" ng-model="app.network.learningRate">
+                        </div>
+                        <div class="field">
+                            <label>Weight init</label>
+                            <select class="ui dropdown" placeholder="Weight init" ng-model="app.network.weightInit" ng-options="activation for activation in app.configuration.weightInits">                               
+                            </select>
                         </div>
                         <div class="field">
                             <label>Activation</label>
@@ -68,7 +106,5 @@
                 </div>
             </div>
         </div>
-
-
     </body>
 </html>

@@ -1,7 +1,10 @@
 package ch.christianmenz.imagefilters;
 
 import javax.xml.bind.annotation.XmlRootElement;
+import org.deeplearning4j.nn.api.OptimizationAlgorithm;
+import org.deeplearning4j.nn.conf.Updater;
 import org.nd4j.linalg.activations.Activation;
+import org.nd4j.linalg.lossfunctions.LossFunctions;
 
 /**
  *
@@ -16,13 +19,13 @@ public class NetworkConfiguration {
 
     private double learningRate;
 
-    private String activation;
+    private Activation activation;
 
-    private String optimizationAlgo;
+    private OptimizationAlgorithm optimizationAlgo;
 
-    private String updater;
+    private Updater updater;
 
-    private String lossFunction;
+    private LossFunctions.LossFunction lossFunction;
 
     private double momentum;
 
@@ -50,35 +53,35 @@ public class NetworkConfiguration {
         this.learningRate = learningRate;
     }
 
-    public String getActivation() {
+    public Activation getActivation() {
         return activation;
     }
 
-    public void setActivation(String activation) {
+    public void setActivation(Activation activation) {
         this.activation = activation;
     }
 
-    public String getOptimizationAlgo() {
+    public OptimizationAlgorithm getOptimizationAlgo() {
         return optimizationAlgo;
     }
 
-    public void setOptimizationAlgo(String optimizationAlgo) {
+    public void setOptimizationAlgo(OptimizationAlgorithm optimizationAlgo) {
         this.optimizationAlgo = optimizationAlgo;
     }
 
-    public String getUpdater() {
+    public Updater getUpdater() {
         return updater;
     }
 
-    public void setUpdater(String updater) {
+    public void setUpdater(Updater updater) {
         this.updater = updater;
     }
 
-    public String getLossFunction() {
+    public LossFunctions.LossFunction getLossFunction() {
         return lossFunction;
     }
 
-    public void setLossFunction(String lossFunction) {
+    public void setLossFunction(LossFunctions.LossFunction lossFunction) {
         this.lossFunction = lossFunction;
     }
 
