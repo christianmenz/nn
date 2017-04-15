@@ -7,15 +7,14 @@
 
         <title>Neural Netowk Image Filter</title>
         <link rel="stylesheet" type="text/css" href="libs/semantic.min.css">
-        <link rel="stylesheet" type="text/css" href="style.css">
+        <link rel="stylesheet" type="text/css" href="style.css">      
 
-
-        <!--<script src="../dist/semantic.js"></script>-->
-
-        <script src="libs/angular.min.js" type="text/javascript">
-        </script>
+        <script src="libs/jquery-3.2.1.min.js" type="text/javascript"></script>
+        <script src="libs/semantic.min.js" type="text/javascript"></script>
+        <script src="libs/angular.min.js" type="text/javascript"></script>        
+        <script src="app.js" type="text/javascript"></script>        
     </head>
-    <body>
+    <body ng-app="neuralApp" ng-controller="AppCtrl as app">
 
         <div class="ui inverted vertical head center aligned segment"> 
             <div class="ui text container">
@@ -25,7 +24,48 @@
                 <h2>create your own neural network powered image filter.</h2>
                 <div class="ui huge primary button">Get Started <i class="right arrow icon"></i></div>
             </div>
-
         </div>  
+
+        <div class="ui vertical stripe segment">
+            <div class="ui middle aligned stackable grid container">
+                <div class="row">
+                    <form class="ui form">
+                        <div class="field">
+                            <label>Learning rate</label>
+                            <input type="text"  placeholder="Learning rate" ng-model="app.configuration.learningRate">
+                        </div>
+                        <div class="field">
+                            <label>Activation</label>
+                            <input type="text" placeholder="Activation" ng-model="app.configuration.activation">
+                        </div>
+                        <div class="field">
+                            <label>Optimization algorithm</label>
+                            <input type="text" placeholder="Optimization algorithm" ng-model="app.configuration.optimizationAlgo">
+                        </div>
+                        <div class="field">
+                            <label>Updater</label>
+                            <input type="text" placeholder="Updater" ng-model="app.configuration.updater">
+                        </div>
+                        <div class="field">
+                            <label>Momentum</label>
+                            <input type="text" placeholder="Momentum" ng-model="app.configuration.momentum">
+                        </div>
+                        <div class="field">
+                            <label>Loss function</label>
+                            <select class="ui dropdown" placeholder="Loss function" ng-model="app.configuration.lossFunction" ng-options="lossFunction for lossFunction in app.lossFunctions">
+                            </select>
+                        </div>
+
+
+                        <button class="ui button" type="button" ng-click="app.createNetwork()">Create network</button>
+                    </form>
+                </div>
+                <div class="row">
+
+                </div>
+            </div>
+        </div>
+
+
     </body>
 </html>
