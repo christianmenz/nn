@@ -5,6 +5,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import javax.imageio.ImageIO;
+import org.deeplearning4j.eval.Evaluation;
 import org.deeplearning4j.nn.api.OptimizationAlgorithm;
 import org.deeplearning4j.nn.conf.MultiLayerConfiguration;
 import org.deeplearning4j.nn.conf.NeuralNetConfiguration;
@@ -18,24 +19,37 @@ import org.nd4j.linalg.activations.Activation;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.lossfunctions.LossFunctions;
+import org.nd4j.linalg.lossfunctions.LossFunctions.LossFunction;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.context.annotation.SessionScope;
+import org.springframework.web.bind.annotation.RequestBody;
 
 /**
  *
  * @author Christian
  */
-public class ImageFilterExample {
-    
+@RestController
+@SessionScope
+@RequestMapping("/nn")
+public class NeuralNetwork {
+
     private MultiLayerNetwork network;
     
-    public static void main(String[] args) throws IOException {
-        ImageFilterExample filter = new ImageFilterExample();
-        filter.setupNetwork();
-        filter.train();
-        filter.test();
+    private TrainingData trainingData;
+    
+    private int epoch;
+    
+    private int iteration;
+    
+    private Evaluation evaluation;
+    
+    private BufferedImage output;
 
-    }   
-
-    private void setupNetwork() {
+    @RequestMapping(path = "configure", method = RequestMethod.POST)
+    public void configure(@RequestBody NetworkConfiguration networkConfiguration) {
         MultiLayerConfiguration configuration = new NeuralNetConfiguration.Builder()
                 .seed(12)
                 .optimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT)
@@ -52,9 +66,33 @@ public class ImageFilterExample {
         network = new MultiLayerNetwork(configuration);
         network.init();
         network.setListeners(new ScoreIterationListener(1));
+    }
+
+    @RequestMapping(path = "provideData", method = RequestMethod.POST)
+    public void provideData(@RequestBody TrainingData trainingData) {
 
     }
 
+    @RequestMapping(path = "configuration", method = RequestMethod.GET)
+    public ResponseEntity<Configuration> configuration() {
+        Configuration config = new Configuration();
+        config.setActivations(Activation.values());
+        config.setLossFunctions(LossFunction.values());
+        config.setOptimizationAlgos(OptimizationAlgorithm.values());
+        config.setWeightInits(WeightInit.values());
+        config.setUpdaters(Updater.values());
+        return ResponseEntity.ok(config);
+    }
+
+//    public static void main(String[] args) throws IOException {
+//        NeuralNetwork filter = new NeuralNetwork();
+//        NetworkConfiguration networkConfiguration = new NetworkConfiguration();
+//
+//        filter.configure(networkConfiguration);
+//        filter.train();
+//        filter.test();
+//
+//    }
     private void train() throws IOException {
         int maxEpoch = 10;
 
@@ -69,7 +107,7 @@ public class ImageFilterExample {
 
             for (int x = 0; x < width; x++) {
                 for (int y = 0; y < height; y++) {
-                    
+
                     readPixel(inputImage, input, 0, x - 1, y - 1);
                     readPixel(inputImage, input, 1, x, y - 1);
                     readPixel(inputImage, input, 2, x + 1, y - 1);
@@ -79,7 +117,7 @@ public class ImageFilterExample {
                     readPixel(inputImage, input, 6, x - 1, y + 1);
                     readPixel(inputImage, input, 7, x, y + 1);
                     readPixel(inputImage, input, 8, x + 1, y + 1);
-                    
+
                     readPixel(outputImage, output, 0, x, y);
 
                     network.fit(input, output);
@@ -98,10 +136,10 @@ public class ImageFilterExample {
 
         int rgb = inputImage.getRGB(x, y);
         Color c = new Color(rgb);
-                
+
         input.putScalar(index * 3, c.getRed() / 255d);
         input.putScalar(index * 3 + 1, c.getGreen() / 255d);
-        input.putScalar(index * 3 + 2, c.getBlue() / 255d);        
+        input.putScalar(index * 3 + 2, c.getBlue() / 255d);
 
     }
 
@@ -109,14 +147,14 @@ public class ImageFilterExample {
         BufferedImage inputImage = ImageIO.read(new File("in.png"));
         int height = inputImage.getHeight(null);
         int width = inputImage.getWidth(null);
-        
+
         INDArray input = Nd4j.zeros(27); // reuse
 
         BufferedImage outputImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
 
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
-                
+
                 readPixel(inputImage, input, 0, x - 1, y - 1);
                 readPixel(inputImage, input, 1, x, y - 1);
                 readPixel(inputImage, input, 2, x + 1, y - 1);
@@ -129,7 +167,7 @@ public class ImageFilterExample {
 
                 INDArray out = network.output(input);
 
-                Color c = new Color((int) (out.getDouble(0) * 255), (int) (out.getDouble(1) * 255), (int) (out.getDouble(2) * 255));                
+                Color c = new Color((int) (out.getDouble(0) * 255), (int) (out.getDouble(1) * 255), (int) (out.getDouble(2) * 255));
                 outputImage.setRGB(x, y, c.getRGB());
 
             }
