@@ -1,3 +1,5 @@
-.head.segment {
-    min-height: 300px;
+.head.ui.vertical.segment {
+    min-height: 100vh;
+    background-image: url('board-1709193_1920.jpg');
+    background-size:cover
 }
