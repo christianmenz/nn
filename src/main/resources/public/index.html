@@ -11,7 +11,8 @@
 
         <script src="libs/jquery-3.2.1.min.js" type="text/javascript"></script>
         <script src="libs/semantic.min.js" type="text/javascript"></script>
-        <script src="libs/angular.min.js" type="text/javascript"></script>        
+        <script src="libs/angular.min.js" type="text/javascript"></script>       
+        <script src="libs/ng-file-upload.min.js" type="text/javascript"></script>        
         <script src="app.js" type="text/javascript"></script>        
     </head>
     <body ng-app="neuralApp" ng-controller="AppCtrl as app">
@@ -105,21 +106,26 @@
                         <div class="field">
                             <label>Training input</label>
                             <div class="ui small image">
-                                <img src="image.png">
+                                <img src="image.png" ng-if="!app.trainingData.trainingInput" ngf-change="app.addFile($file, 'trainingInput')" ngf-select ngf-max-size="1MB" ngf-accept="'image/*'" ngf-pattern="'image/*'">
+                                <img ng-if="app.trainingData.trainingInput" src="{{app.trainingData.trainingInput}}">                                
                             </div>
                         </div>
                         <div class="field">
                             <label>Training output</label>
                             <div class="ui small image">
-                                <img src="image.png">
+                                <img src="image.png" ng-if="!app.trainingData.trainingOutput" ngf-change="app.addFile($file, 'trainingOutput')" ngf-select ngf-max-size="1MB" ngf-accept="'image/*'" ngf-pattern="'image/*'">
+                                <img ng-if="app.trainingData.trainingOutput" src="{{app.trainingData.trainingOutput}}">                                
                             </div>
                         </div>
                         <div class="field">
                             <label>Test file</label>
-                            <div class="ui small image">
-                                <img src="image.png">
+                           <div class="ui small image">
+                                <img src="image.png" ng-if="!app.trainingData.testFile" ngf-change="app.addFile($file, 'testFile')" ngf-select ngf-max-size="1MB" ngf-accept="'image/*'" ngf-pattern="'image/*'">
+                                <img ng-if="app.trainingData.testFile" src="{{app.trainingData.testFile}}">                                
                             </div>
                         </div>
+                        <button class="ui button" type="button" ng-click="app.startTraining()">Start training</button>
+
                     </form>
 
                 </div>

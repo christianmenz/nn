@@ -13,7 +13,7 @@ class TrainingData {
 
     private String trainingOutput;
 
-    private String testtFile;
+    private String testFile;
 
     public String getTrainingInput() {
         return trainingInput;
@@ -31,12 +31,12 @@ class TrainingData {
         this.trainingOutput = trainingOutput;
     }
 
-    public String getTesttFile() {
-        return testtFile;
+    public String getTestFile() {
+        return testFile;
     }
 
-    public void setTesttFile(String testtFile) {
-        this.testtFile = testtFile;
+    public void setTestFile(String testFile) {
+        this.testFile = testFile;
     }
 
 }

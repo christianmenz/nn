@@ -37,28 +37,28 @@ import org.springframework.web.bind.annotation.RequestBody;
 public class NeuralNetwork {
 
     private MultiLayerNetwork network;
-    
+
     private TrainingData trainingData;
-    
+
     private int epoch;
-    
+
     private int iteration;
-    
+
     private Evaluation evaluation;
-    
+
     private BufferedImage output;
 
     @RequestMapping(path = "configure", method = RequestMethod.POST)
     public void configure(@RequestBody NetworkConfiguration networkConfiguration) {
         MultiLayerConfiguration configuration = new NeuralNetConfiguration.Builder()
                 .seed(12)
-                .optimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT)
-                .updater(Updater.SGD)
-                .learningRate(0.1d)
+                .optimizationAlgo(networkConfiguration.getOptimizationAlgo())
+                .updater(networkConfiguration.getUpdater())
+                .learningRate(networkConfiguration.getLearningRate())
                 .list()
-                .layer(0, new DenseLayer.Builder().nIn(27).nOut(27).activation(Activation.SIGMOID).weightInit(WeightInit.XAVIER).build())
-                .layer(1, new DenseLayer.Builder().nIn(27).nOut(8).activation(Activation.SIGMOID).weightInit(WeightInit.XAVIER).build())
-                .layer(2, new OutputLayer.Builder().nIn(8).nOut(3).activation(Activation.SIGMOID).weightInit(WeightInit.XAVIER).lossFunction(LossFunctions.LossFunction.L2).build())
+                .layer(0, new DenseLayer.Builder().nIn(27).nOut(27).activation(networkConfiguration.getActivation()).weightInit(networkConfiguration.getWeightInit()).build())
+                .layer(1, new DenseLayer.Builder().nIn(27).nOut(8).activation(networkConfiguration.getActivation()).weightInit(networkConfiguration.getWeightInit()).build())
+                .layer(2, new OutputLayer.Builder().nIn(8).nOut(3).activation(networkConfiguration.getActivation()).weightInit(networkConfiguration.getWeightInit()).lossFunction(networkConfiguration.getLossFunction()).build())
                 .pretrain(false)
                 .backprop(true)
                 .build();

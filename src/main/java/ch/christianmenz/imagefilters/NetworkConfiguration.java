@@ -3,6 +3,7 @@ package ch.christianmenz.imagefilters;
 import javax.xml.bind.annotation.XmlRootElement;
 import org.deeplearning4j.nn.api.OptimizationAlgorithm;
 import org.deeplearning4j.nn.conf.Updater;
+import org.deeplearning4j.nn.weights.WeightInit;
 import org.nd4j.linalg.activations.Activation;
 import org.nd4j.linalg.lossfunctions.LossFunctions;
 
@@ -26,8 +27,20 @@ public class NetworkConfiguration {
     private Updater updater;
 
     private LossFunctions.LossFunction lossFunction;
+    
+    private WeightInit weightInit;
 
     private double momentum;
+
+    public WeightInit getWeightInit() {
+        return weightInit;
+    }
+
+    public void setWeightInit(WeightInit weightInit) {
+        this.weightInit = weightInit;
+    }
+    
+    
 
     public int getRadius() {
         return radius;
