@@ -94,8 +94,6 @@
                             <select class="ui dropdown" placeholder="Loss function" ng-model="app.network.lossFunction" ng-options="lossFunction for lossFunction in app.configuration.lossFunctions">
                             </select>                            
                         </div>
-
-
                         <button class="ui button" type="button" ng-click="app.createNetwork()">Create network</button>
                     </form>
                 </div>
@@ -107,30 +105,42 @@
                             <label>Training input</label>
                             <div class="ui small image">
                                 <img src="image.png" ng-if="!app.trainingData.trainingInput" ngf-change="app.addFile($file, 'trainingInput')" ngf-select ngf-max-size="1MB" ngf-accept="'image/*'" ngf-pattern="'image/*'">
-                                <img ng-if="app.trainingData.trainingInput" src="{{app.trainingData.trainingInput}}">                                
+                                <img ng-if="app.trainingData.trainingInput" ng-src="{{app.trainingData.trainingInput}}">                                
                             </div>
                         </div>
                         <div class="field">
                             <label>Training output</label>
                             <div class="ui small image">
                                 <img src="image.png" ng-if="!app.trainingData.trainingOutput" ngf-change="app.addFile($file, 'trainingOutput')" ngf-select ngf-max-size="1MB" ngf-accept="'image/*'" ngf-pattern="'image/*'">
-                                <img ng-if="app.trainingData.trainingOutput" src="{{app.trainingData.trainingOutput}}">                                
+                                <img ng-if="app.trainingData.trainingOutput" ng-src="{{app.trainingData.trainingOutput}}">                                
                             </div>
                         </div>
                         <div class="field">
                             <label>Test file</label>
-                           <div class="ui small image">
+                            <div class="ui small image">
                                 <img src="image.png" ng-if="!app.trainingData.testFile" ngf-change="app.addFile($file, 'testFile')" ngf-select ngf-max-size="1MB" ngf-accept="'image/*'" ngf-pattern="'image/*'">
-                                <img ng-if="app.trainingData.testFile" src="{{app.trainingData.testFile}}">                                
+                                <img ng-if="app.trainingData.testFile" ng-src="{{app.trainingData.testFile}}">                                
                             </div>
                         </div>
                         <button class="ui button" type="button" ng-click="app.startTraining()">Start training</button>
-
                     </form>
 
                 </div>
                 <!-- Step 2 -->
                 <div class="row" ng-if="app.state === 2">
+                    <form class="ui form">                      
+                        <div class="field">
+                            <label>Test output</label>
+                            <div class="ui large image">
+                                <div class="ui active dimmer" ng-if="app.training">
+                                    <div class="ui massive text loader">Training</div>
+                                </div>
+                                <img ng-src="/nn/testOutput.png?i={{app.iteration}}" >                               
+                            </div>
+                        </div>
+                        <button class="ui button" type="button" ng-click="app.trainingStep()">Training step</button>
+                        <button class="ui button" type="button" ng-click="app.finishTraining()">Finish training</button>
+                    </form>
                 </div>
                 <!-- Step 3 -->
                 <div class="row" ng-if="app.state === 3">

@@ -6,12 +6,16 @@ angular.module('neuralApp', ['ngFileUpload']).controller('AppCtrl', function ($h
 
     that.createNetwork = createNetwork;
     that.startTraining = startTraining;
+    that.finishTraining = finishTraining;
+    that.trainingStep = trainingStep;
     that.addFile = addFile;
 
     that.state = 0;
+    that.training = false;
+    that.iteration = 0;
     that.trainingData = {};
     that.network = {
-        learningRate: 0.01,
+        learningRate: 0.1,
         activation: 'SIGMOID',
         lossFunction: 'L2',
         updater: 'SGD',
@@ -53,14 +57,20 @@ angular.module('neuralApp', ['ngFileUpload']).controller('AppCtrl', function ($h
     }
 
     function startTraining() {
-        that.state++;
+          $http.post('/nn/provideTrainingData', that.trainingData).then(function (response) {
+            that.state++;
+        })
     }
 
-    function step() {
-
+    function finishTraining() {
+        that.step++;
     }
 
-    function reset() {
-        that.state = 0;
+    function trainingStep() {
+        that.training = true;
+        $http.post('/nn/trainingStep').then(function(response) {
+            that.iteration++;
+            that.training = false;
+        })
     }
 })

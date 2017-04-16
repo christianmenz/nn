@@ -2,9 +2,12 @@ package ch.christianmenz.imagefilters;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import javax.imageio.ImageIO;
+import org.apache.commons.codec.binary.Base64;
 import org.deeplearning4j.eval.Evaluation;
 import org.deeplearning4j.nn.api.OptimizationAlgorithm;
 import org.deeplearning4j.nn.conf.MultiLayerConfiguration;
@@ -20,6 +23,7 @@ import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.lossfunctions.LossFunctions;
 import org.nd4j.linalg.lossfunctions.LossFunctions.LossFunction;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -38,8 +42,6 @@ public class NeuralNetwork {
 
     private MultiLayerNetwork network;
 
-    private TrainingData trainingData;
-
     private int epoch;
 
     private int iteration;
@@ -47,6 +49,18 @@ public class NeuralNetwork {
     private Evaluation evaluation;
 
     private BufferedImage output;
+
+    private BufferedImage inputImage;
+
+    private BufferedImage outputImage;
+
+    private BufferedImage testImage;
+
+    private BufferedImage testOutputImage;
+
+    private int x;
+
+    private int y;
 
     @RequestMapping(path = "configure", method = RequestMethod.POST)
     public void configure(@RequestBody NetworkConfiguration networkConfiguration) {
@@ -65,12 +79,17 @@ public class NeuralNetwork {
 
         network = new MultiLayerNetwork(configuration);
         network.init();
-        network.setListeners(new ScoreIterationListener(1));
+        network.setListeners(new ScoreIterationListener(1000));
     }
 
-    @RequestMapping(path = "provideData", method = RequestMethod.POST)
-    public void provideData(@RequestBody TrainingData trainingData) {
-
+    @RequestMapping(path = "provideTrainingData", method = RequestMethod.POST)
+    public void provideTrainingData(@RequestBody TrainingData trainingData) throws IOException {
+        String encodingPrefix = "data:image/png;base64,";        
+        
+        inputImage = ImageIO.read(new ByteArrayInputStream(Base64.decodeBase64(trainingData.getTrainingInput().substring(encodingPrefix.length()))));
+        outputImage = ImageIO.read(new ByteArrayInputStream(Base64.decodeBase64(trainingData.getTrainingOutput().substring(encodingPrefix.length()))));
+        testOutputImage = ImageIO.read(new ByteArrayInputStream(Base64.decodeBase64(trainingData.getTestFile().substring(encodingPrefix.length()))));
+        testImage = ImageIO.read(new ByteArrayInputStream(Base64.decodeBase64(trainingData.getTestFile().substring(encodingPrefix.length()))));
     }
 
     @RequestMapping(path = "configuration", method = RequestMethod.GET)
@@ -84,46 +103,46 @@ public class NeuralNetwork {
         return ResponseEntity.ok(config);
     }
 
-//    public static void main(String[] args) throws IOException {
-//        NeuralNetwork filter = new NeuralNetwork();
-//        NetworkConfiguration networkConfiguration = new NetworkConfiguration();
-//
-//        filter.configure(networkConfiguration);
-//        filter.train();
-//        filter.test();
-//
-//    }
-    private void train() throws IOException {
-        int maxEpoch = 10;
+    @RequestMapping(path = "trainingStep", method = RequestMethod.POST)
+    public void trainingStep() throws IOException {
 
-        BufferedImage inputImage = ImageIO.read(new File("cat.png"));
-        BufferedImage outputImage = ImageIO.read(new File("cat_heat.png"));
         INDArray input = Nd4j.zeros(27); // reuse
         INDArray output = Nd4j.zeros(3); // reuse
 
-        for (int epoch = 0; epoch < maxEpoch; epoch++) {
-            int width = inputImage.getWidth(null);
-            int height = inputImage.getHeight(null);
+        int width = inputImage.getWidth(null);
+        int height = inputImage.getHeight(null);
 
-            for (int x = 0; x < width; x++) {
-                for (int y = 0; y < height; y++) {
+        for (x = 0; x < width; x++) {
+            for (y = 0; y < height; y++) {
 
-                    readPixel(inputImage, input, 0, x - 1, y - 1);
-                    readPixel(inputImage, input, 1, x, y - 1);
-                    readPixel(inputImage, input, 2, x + 1, y - 1);
-                    readPixel(inputImage, input, 3, x - 1, y);
-                    readPixel(inputImage, input, 4, x, y);
-                    readPixel(inputImage, input, 5, x + 1, y);
-                    readPixel(inputImage, input, 6, x - 1, y + 1);
-                    readPixel(inputImage, input, 7, x, y + 1);
-                    readPixel(inputImage, input, 8, x + 1, y + 1);
+                readPixel(inputImage, input, 0, x - 1, y - 1);
+                readPixel(inputImage, input, 1, x, y - 1);
+                readPixel(inputImage, input, 2, x + 1, y - 1);
+                readPixel(inputImage, input, 3, x - 1, y);
+                readPixel(inputImage, input, 4, x, y);
+                readPixel(inputImage, input, 5, x + 1, y);
+                readPixel(inputImage, input, 6, x - 1, y + 1);
+                readPixel(inputImage, input, 7, x, y + 1);
+                readPixel(inputImage, input, 8, x + 1, y + 1);
 
-                    readPixel(outputImage, output, 0, x, y);
+                readPixel(outputImage, output, 0, x, y);
 
-                    network.fit(input, output);
-                }
+                network.fit(input, output);
             }
         }
+
+        x++;
+        y++;
+
+        if (x > width) {
+            x = 0;
+        }
+
+        if (y > height) {
+            y = 0;
+        }
+
+        test();
     }
 
     private void readPixel(BufferedImage inputImage, INDArray input, int index, int x, int y) {
@@ -140,40 +159,43 @@ public class NeuralNetwork {
         input.putScalar(index * 3, c.getRed() / 255d);
         input.putScalar(index * 3 + 1, c.getGreen() / 255d);
         input.putScalar(index * 3 + 2, c.getBlue() / 255d);
+    }
 
+    @RequestMapping(value = "/testOutput.png", method = RequestMethod.GET, produces = MediaType.IMAGE_PNG_VALUE)
+    public ResponseEntity<byte[]> getTestoutput() throws IOException {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ImageIO.write(testOutputImage, "png", baos);
+        return ResponseEntity.ok(baos.toByteArray());
     }
 
     private void test() throws IOException {
-        BufferedImage inputImage = ImageIO.read(new File("in.png"));
-        int height = inputImage.getHeight(null);
-        int width = inputImage.getWidth(null);
+        int height = testImage.getHeight(null);
+        int width = testImage.getWidth(null);
 
         INDArray input = Nd4j.zeros(27); // reuse
 
-        BufferedImage outputImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+        testOutputImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
 
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
 
-                readPixel(inputImage, input, 0, x - 1, y - 1);
-                readPixel(inputImage, input, 1, x, y - 1);
-                readPixel(inputImage, input, 2, x + 1, y - 1);
-                readPixel(inputImage, input, 3, x - 1, y);
-                readPixel(inputImage, input, 4, x, y);
-                readPixel(inputImage, input, 5, x + 1, y);
-                readPixel(inputImage, input, 6, x - 1, y + 1);
-                readPixel(inputImage, input, 7, x, y + 1);
-                readPixel(inputImage, input, 8, x + 1, y + 1);
+                readPixel(testImage, input, 0, x - 1, y - 1);
+                readPixel(testImage, input, 1, x, y - 1);
+                readPixel(testImage, input, 2, x + 1, y - 1);
+                readPixel(testImage, input, 3, x - 1, y);
+                readPixel(testImage, input, 4, x, y);
+                readPixel(testImage, input, 5, x + 1, y);
+                readPixel(testImage, input, 6, x - 1, y + 1);
+                readPixel(testImage, input, 7, x, y + 1);
+                readPixel(testImage, input, 8, x + 1, y + 1);
 
                 INDArray out = network.output(input);
 
                 Color c = new Color((int) (out.getDouble(0) * 255), (int) (out.getDouble(1) * 255), (int) (out.getDouble(2) * 255));
-                outputImage.setRGB(x, y, c.getRGB());
-
+                testOutputImage.setRGB(x, y, c.getRGB());
             }
-
         }
-        ImageIO.write(outputImage, "png", new File("test-out.png"));
+        ImageIO.write(testOutputImage, "png", new File("test-out.png"));
     }
 
 }
