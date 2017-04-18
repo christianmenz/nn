@@ -4,7 +4,6 @@ import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
 import javax.imageio.ImageIO;
 import org.apache.commons.codec.binary.Base64;
@@ -21,7 +20,6 @@ import org.deeplearning4j.optimize.listeners.ScoreIterationListener;
 import org.nd4j.linalg.activations.Activation;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
-import org.nd4j.linalg.lossfunctions.LossFunctions;
 import org.nd4j.linalg.lossfunctions.LossFunctions.LossFunction;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -46,9 +44,9 @@ public class NeuralNetwork {
 
     private int iteration;
 
-    private Evaluation evaluation;
+    private int batchSize;
 
-    private BufferedImage output;
+    private Evaluation evaluation;
 
     private BufferedImage inputImage;
 
@@ -69,6 +67,7 @@ public class NeuralNetwork {
                 .optimizationAlgo(networkConfiguration.getOptimizationAlgo())
                 .updater(networkConfiguration.getUpdater())
                 .learningRate(networkConfiguration.getLearningRate())
+                .momentum(networkConfiguration.getMomentum())
                 .list()
                 .layer(0, new DenseLayer.Builder().nIn(27).nOut(27).activation(networkConfiguration.getActivation()).weightInit(networkConfiguration.getWeightInit()).build())
                 .layer(1, new DenseLayer.Builder().nIn(27).nOut(8).activation(networkConfiguration.getActivation()).weightInit(networkConfiguration.getWeightInit()).build())
@@ -80,12 +79,13 @@ public class NeuralNetwork {
         network = new MultiLayerNetwork(configuration);
         network.init();
         network.setListeners(new ScoreIterationListener(1000));
+        batchSize = networkConfiguration.getBatchSize();
     }
 
     @RequestMapping(path = "provideTrainingData", method = RequestMethod.POST)
     public void provideTrainingData(@RequestBody TrainingData trainingData) throws IOException {
-        String encodingPrefix = "data:image/png;base64,";        
-        
+        String encodingPrefix = "data:image/png;base64,";
+
         inputImage = ImageIO.read(new ByteArrayInputStream(Base64.decodeBase64(trainingData.getTrainingInput().substring(encodingPrefix.length()))));
         outputImage = ImageIO.read(new ByteArrayInputStream(Base64.decodeBase64(trainingData.getTrainingOutput().substring(encodingPrefix.length()))));
         testOutputImage = ImageIO.read(new ByteArrayInputStream(Base64.decodeBase64(trainingData.getTestFile().substring(encodingPrefix.length()))));
@@ -112,8 +112,17 @@ public class NeuralNetwork {
         int width = inputImage.getWidth(null);
         int height = inputImage.getHeight(null);
 
-        for (x = 0; x < width; x++) {
-            for (y = 0; y < height; y++) {
+        int iterationCounter = 0;
+
+        loop:
+        for (; x < width; x++) {
+            for (; y < height; y++) {
+
+                iterationCounter++;
+
+                if (iterationCounter >= batchSize) {
+                    break loop;
+                }
 
                 readPixel(inputImage, input, 0, x - 1, y - 1);
                 readPixel(inputImage, input, 1, x, y - 1);
@@ -129,16 +138,14 @@ public class NeuralNetwork {
 
                 network.fit(input, output);
             }
+            y = 0; // reset the y counter when I get here..
         }
 
-        x++;
-        y++;
-
-        if (x > width) {
+        if (x >= width) {
             x = 0;
         }
 
-        if (y > height) {
+        if (y >= height) {
             y = 0;
         }
 
@@ -179,6 +186,12 @@ public class NeuralNetwork {
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
 
+                Color testColor = new Color(testImage.getRGB(x, y), true);
+                if (testColor.getAlpha() == 0) {
+                    testOutputImage.setRGB(x, y, testColor.getRGB()); // alpha??
+                    continue;
+                }
+
                 readPixel(testImage, input, 0, x - 1, y - 1);
                 readPixel(testImage, input, 1, x, y - 1);
                 readPixel(testImage, input, 2, x + 1, y - 1);
@@ -195,7 +208,6 @@ public class NeuralNetwork {
                 testOutputImage.setRGB(x, y, c.getRGB());
             }
         }
-        ImageIO.write(testOutputImage, "png", new File("test-out.png"));
     }
 
 }

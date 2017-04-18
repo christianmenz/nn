@@ -16,6 +16,8 @@ public class NetworkConfiguration {
 
     private int radius;
 
+    private int batchSize;
+
     private int[] layers;
 
     private double learningRate;
@@ -27,7 +29,7 @@ public class NetworkConfiguration {
     private Updater updater;
 
     private LossFunctions.LossFunction lossFunction;
-    
+
     private WeightInit weightInit;
 
     private double momentum;
@@ -39,8 +41,14 @@ public class NetworkConfiguration {
     public void setWeightInit(WeightInit weightInit) {
         this.weightInit = weightInit;
     }
-    
-    
+
+    public int getBatchSize() {
+        return batchSize;
+    }
+
+    public void setBatchSize(int batchSize) {
+        this.batchSize = batchSize;
+    }
 
     public int getRadius() {
         return radius;

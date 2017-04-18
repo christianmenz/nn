@@ -1,4 +1,3 @@
-
 angular.module('neuralApp', ['ngFileUpload']).controller('AppCtrl', function ($http, $scope) {
 
     var that = this;
@@ -6,8 +5,8 @@ angular.module('neuralApp', ['ngFileUpload']).controller('AppCtrl', function ($h
 
     that.createNetwork = createNetwork;
     that.startTraining = startTraining;
-    that.finishTraining = finishTraining;
     that.trainingStep = trainingStep;
+    that.startOver = startOver;
     that.addFile = addFile;
 
     that.state = 0;
@@ -16,11 +15,13 @@ angular.module('neuralApp', ['ngFileUpload']).controller('AppCtrl', function ($h
     that.trainingData = {};
     that.network = {
         learningRate: 0.1,
+        batchSize: 500,
         activation: 'SIGMOID',
         lossFunction: 'L2',
         updater: 'SGD',
         optimizationAlgo: 'STOCHASTIC_GRADIENT_DESCENT',
-        weightInit: 'XAVIER'
+        weightInit: 'XAVIER',
+        momentum: 0.1
     };
 
     activate();
@@ -31,6 +32,10 @@ angular.module('neuralApp', ['ngFileUpload']).controller('AppCtrl', function ($h
         $http.get('/nn/configuration').then(function (response) {
             that.configuration = response.data;
         })
+    }
+    
+    function startOver() {
+        that.state = 0;
     }
 
     function addFile($file, fileType) {
@@ -57,18 +62,15 @@ angular.module('neuralApp', ['ngFileUpload']).controller('AppCtrl', function ($h
     }
 
     function startTraining() {
-          $http.post('/nn/provideTrainingData', that.trainingData).then(function (response) {
+        $http.post('/nn/provideTrainingData', that.trainingData).then(function (response) {
             that.state++;
         })
     }
 
-    function finishTraining() {
-        that.step++;
-    }
 
     function trainingStep() {
         that.training = true;
-        $http.post('/nn/trainingStep').then(function(response) {
+        $http.post('/nn/trainingStep').then(function (response) {
             that.iteration++;
             that.training = false;
         })

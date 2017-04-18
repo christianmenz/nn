@@ -3,3 +3,7 @@
     background-image: url('board-1709193_1920.jpg');
     background-size:cover
 }
+
+#main {
+    min-height: 100vh;
+}
