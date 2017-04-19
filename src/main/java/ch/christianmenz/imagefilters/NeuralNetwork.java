@@ -66,7 +66,7 @@ public class NeuralNetwork {
                 .seed(12)
                 .optimizationAlgo(networkConfiguration.getOptimizationAlgo())
                 .updater(networkConfiguration.getUpdater())
-                .learningRate(networkConfiguration.getLearningRate())
+                .learningRate(networkConfiguration.getLearningRate())                
                 .momentum(networkConfiguration.getMomentum())
                 .list()
                 .layer(0, new DenseLayer.Builder().nIn(27).nOut(27).activation(networkConfiguration.getActivation()).weightInit(networkConfiguration.getWeightInit()).build())
@@ -99,7 +99,7 @@ public class NeuralNetwork {
         config.setLossFunctions(LossFunction.values());
         config.setOptimizationAlgos(OptimizationAlgorithm.values());
         config.setWeightInits(WeightInit.values());
-        config.setUpdaters(Updater.values());
+        config.setUpdaters(Updater.values());        
         return ResponseEntity.ok(config);
     }
 
@@ -135,8 +135,8 @@ public class NeuralNetwork {
                 readPixel(inputImage, input, 8, x + 1, y + 1);
 
                 readPixel(outputImage, output, 0, x, y);
-
-                network.fit(input, output);
+                
+                network.fit(input, output); // really fit each single pixel?
             }
             y = 0; // reset the y counter when I get here..
         }
@@ -179,18 +179,22 @@ public class NeuralNetwork {
         int height = testImage.getHeight(null);
         int width = testImage.getWidth(null);
 
-        INDArray input = Nd4j.zeros(27); // reuse
+        INDArray allInputs = Nd4j.zeros(height * width, 27); // reuse
 
         testOutputImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
 
+        int co = 0;
+
         for (int x = 0; x < width; x++) {
-            for (int y = 0; y < height; y++) {
+            for (int y = 0; y < height; y++) {                
 
                 Color testColor = new Color(testImage.getRGB(x, y), true);
                 if (testColor.getAlpha() == 0) {
                     testOutputImage.setRGB(x, y, testColor.getRGB()); // alpha??
-                    continue;
+                    //continue;
                 }
+
+                INDArray input = Nd4j.zeros(27);
 
                 readPixel(testImage, input, 0, x - 1, y - 1);
                 readPixel(testImage, input, 1, x, y - 1);
@@ -202,10 +206,20 @@ public class NeuralNetwork {
                 readPixel(testImage, input, 7, x, y + 1);
                 readPixel(testImage, input, 8, x + 1, y + 1);
 
-                INDArray out = network.output(input);
+                allInputs.putRow(co, input);
+                co++;
 
-                Color c = new Color((int) (out.getDouble(0) * 255), (int) (out.getDouble(1) * 255), (int) (out.getDouble(2) * 255));
-                testOutputImage.setRGB(x, y, c.getRGB());
+            }
+        }
+        INDArray out = network.output(allInputs);
+
+        co = 0;
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {               
+                INDArray row = out.getRow(co);
+                Color c = new Color((int) (row.getDouble(0) * 255), (int) (row.getDouble(1) * 255), (int) (row.getDouble(2) * 255));
+                testOutputImage.setRGB(x, y, c.getRGB());               
+                co++;
             }
         }
     }
