@@ -7,3 +7,7 @@
 #main {
     min-height: 100vh;
 }
+
+.help {
+    border: 1px solid #0E566C;
+}
