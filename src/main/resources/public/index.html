@@ -54,7 +54,7 @@
                                 <input type="text"  placeholder="Learning rate" ng-model="app.network.learningRate" ng-focus="app.helpFile='learningRate.html'">
                             </div>
                             <div class="field">
-                                <label>Batchsize</label>
+                                <label>Batch size / pixels</label>
                                 <input type="text"  placeholder="Batchsize" ng-model="app.network.batchSize" ng-focus="app.helpFile='batchsize.html'">
                             </div>
                             <div class="field">
@@ -90,7 +90,7 @@
                         </form>
                     </div>
                     <div class="eight wide column">
-                        <div class="help">
+                        <div class="help" ng-if="app.helpFile">
                             <div ng-include="app.helpFile"></div>                                                           
                         </div>
                     </div>                   
@@ -149,7 +149,7 @@
                         <div class="item">
                             <i class="info circle icon"></i>
                             <div class="content">
-                                <div class="header">batch size / Pixels : {{app.network.batchSize}}</div>
+                                <div class="header">batch size / pixels : {{app.network.batchSize}}</div>
                             </div>
                         </div>
 
