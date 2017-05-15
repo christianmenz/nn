@@ -81,25 +81,58 @@ angular.module('neuralApp', ['ngFileUpload']).controller('AppCtrl', function ($h
             that.training = false;
             that.networkModel = response.data;
 
-            var paper = new Raphael(document.getElementById('networkPaper'), 800, 800);
-            paper.setViewBox(0, 0, 2000, 2000, true);
+            document.getElementById('networkPaper').innerHTML = '';
+            var paper = new Raphael(document.getElementById('networkPaper'));
 
-            var xOffset = 50;
-            var yOffset = 50;
+            var xMargin = 1200;
+            var yMargin = 60;
+            var circleRadius = 60;
 
+            var maxNeurons = 0;
+
+            // find "highest" layer 
             for (var l = 0; l < that.networkModel.layers.length; l++) {
-                var layer = that.networkModel.layers[l];
-                var x = l * 300 + xOffset;
-
-                for (var n = 0; n < layer.neurons.length; n++) {
-                    paper.circle(x, n * (60 + yOffset), 30);
-
-                }
+                let n = that.networkModel.layers[l].neurons.length;
+                maxNeurons = n > maxNeurons ? n : maxNeurons;
             }
 
+            // find dimensions
+            let height = maxNeurons * (circleRadius * 2 + yMargin) + yMargin;
+            let width = that.networkModel.layers.length * (circleRadius * 2 + xMargin) + xMargin;
+            paper.setViewBox(0, 0, width, height, true);
+            //paper.canvas.setAttribute('preserveAspectRatio', 'none');                       
 
 
+            for (var l = 0; l < that.networkModel.layers.length; l++) {
+                let layer = that.networkModel.layers[l];
+                let layerHeight = layer.neurons.length * (circleRadius * 2 + yMargin) + yMargin;
+                let yOffset = (height - layerHeight) / 2;
+                let x = l * (circleRadius * 2 + xMargin) + xMargin;
 
+                for (let n = 0; n < layer.neurons.length; n++) {
+                    let y = n * (circleRadius * 2 + yMargin) + yOffset + yMargin;
+
+                    // for each we need a connection to the next layer...
+                    if (l < that.networkModel.layers.length - 1) {
+                        let nextLayer = that.networkModel.layers[l + 1];
+                        let nextLayerHeight = nextLayer.neurons.length * (circleRadius * 2 + yMargin) + yMargin;
+                        let nextLayerYOffset = (height - nextLayerHeight) / 2;
+                        let nextLayerX = (l + 1) * (circleRadius * 2 + xMargin) + xMargin;
+
+                        for (let nextN = 0; nextN < nextLayer.neurons.length; nextN++) {
+                            let nextY = nextN * (circleRadius * 2 + yMargin) + nextLayerYOffset + yMargin;
+                            let p = paper.path('M' + x + ' ' + y + 'L' + nextLayerX + ' ' + nextY);
+                            p.attr('stroke', nextLayer.neurons[nextN].weights[n] > 0 ? 'green' : 'red');
+                            p.attr('stroke-width', Math.abs(nextLayer.neurons[nextN].weights[n]) * 10);
+                        }
+                    }
+
+                    let c = paper.circle(x, y, circleRadius);
+                    c.attr("stroke", "black");
+                    c.attr('stroke-width', '5');
+                    c.attr('fill', 'lightgray');
+                }
+            }
         })
     }
 })

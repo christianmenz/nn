@@ -203,12 +203,7 @@
                                     <div class="header">loss function: {{app.network.lossFunction}}</div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="ui large">
-                            <div id="networkPaper">
-
-                            </div>                        
-                        </div>
+                        </div>                        
                     </div>
 
                     <div class="eight wide column">
@@ -222,6 +217,11 @@
                             <img ng-if="app.trainingData.testFile" ng-src="{{app.trainingData.testFile}}">
                         </div>
                     </div>  
+
+                    <div class="sixteen wide column">
+                        <div id="networkPaper" style="height: 800px">
+                        </div>                        
+                    </div>
                 </div>                    
             </div>
         </div>
