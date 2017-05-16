@@ -12,10 +12,10 @@
 
         <div class="ui inverted vertical head center aligned segment"> 
             <div class="ui text container">
-                <h1 class="ui inverted header">
+                <h1 class="ui inverted my-title">
                     Neural Network Image Filter
                 </h1>
-                <h2>create your own neural network powered image filter</h2>
+                <h1 class="ui inverted my-subtitle">create your own neural network powered image filter</h1>
                 <a href="#main" class="ui huge primary button">Get Started <i class="right arrow icon"></i></a>
             </div>
         </div>  
@@ -127,8 +127,8 @@
                         <div class="ui medium image">
                             <img src="cat-in.jpg" >                           
                         </div>
-                        <div class="ui medium image">
-                            <img src="cat-out.jpg" >                           
+                        <div class="ui medium image" ng-click="app.nextOut()">
+                            <img src="cat-out-{{app.outCnt}}.jpg" >                           
                         </div>
                         <div class="ui medium image">
                             <img src="dog-test.jpg" >                           

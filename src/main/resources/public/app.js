@@ -7,8 +7,11 @@ angular.module('neuralApp', ['ngFileUpload']).controller('AppCtrl', function ($h
     that.trainingStep = trainingStep;
     that.startOver = startOver;
     that.addFile = addFile;
+    that.nextOut = nextOut;
 
     that.state = 0;
+    that.outCnt = 0;
+    that.outSize = 5;
     that.training = false;
     that.iteration = 0;
     that.imagesSelcted = false;
@@ -27,6 +30,13 @@ angular.module('neuralApp', ['ngFileUpload']).controller('AppCtrl', function ($h
     activate();
     ///
 
+
+    function nextOut() {
+        that.outCnt++;
+        if (that.outCnt === that.outSize) {
+            that.outCnt = 0;
+        }
+    }
 
     function activate() {
         $http.get('/nn/configuration').then(function (response) {
@@ -130,7 +140,17 @@ angular.module('neuralApp', ['ngFileUpload']).controller('AppCtrl', function ($h
                     let c = paper.circle(x, y, circleRadius);
                     c.attr("stroke", "black");
                     c.attr('stroke-width', '5');
-                    c.attr('fill', 'lightgray');
+                    if (l === 0 || l === 2) {
+                        if (n % 3 === 0) {
+                            c.attr('fill', 'red');
+                        } else if (n % 3 === 1) {
+                            c.attr('fill', 'green');
+                        } else {
+                            c.attr('fill', 'blue');
+                        }
+                    } else {
+                        c.attr('fill', 'lightgray');
+                    }
                 }
             }
         })

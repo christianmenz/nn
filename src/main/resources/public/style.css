@@ -1,6 +1,6 @@
 .head.ui.vertical.segment {
     min-height: 100vh;
-    background-image: url('board-1709193_1920.jpg');
+    background-image: url('artificial-intelligence-2228610_1920.jpg');
     background-size:cover
 }
 
@@ -11,4 +11,14 @@
 .help {
     border: 2px solid #0E566C;
     padding: 1rem;
+}
+
+.my-title {
+    font-size:7rem;
+    text-shadow: -5px 0 black, 0 2px black, 2px 0 black, 0 -2px black;
+}
+
+.my-subtitle {
+    font-size:3rem;
+    text-shadow: -2px 0 black, 0 2px black, 2px 0 black, 0 -2px black;
 }
