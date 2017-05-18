@@ -41,14 +41,8 @@ public class NeuralNetwork {
 
     private MultiLayerNetwork network;
 
-    private int epoch;
-
-    private int iteration;
-
     private int batchSize;
-
-    private Evaluation evaluation;
-
+    
     private BufferedImage inputImage;
 
     private BufferedImage outputImage;
@@ -102,11 +96,32 @@ public class NeuralNetwork {
     @RequestMapping(path = "configuration", method = RequestMethod.GET)
     public ResponseEntity<Configuration> configuration() {
         Configuration config = new Configuration();
-        config.setActivations(Activation.values());
-        config.setLossFunctions(LossFunction.values());
-        config.setOptimizationAlgos(OptimizationAlgorithm.values());
-        config.setWeightInits(WeightInit.values());
-        config.setUpdaters(Updater.values());
+        config.setActivations(
+                Activation.SIGMOID,
+                Activation.RELU, 
+                Activation.SOFTMAX, 
+                Activation.TANH);
+        config.setLossFunctions(
+                LossFunction.COSINE_PROXIMITY,
+                LossFunction.L1,
+                LossFunction.L2,
+                LossFunction.MEAN_ABSOLUTE_ERROR,
+                LossFunction.MSE,
+                LossFunction.NEGATIVELOGLIKELIHOOD);
+        config.setOptimizationAlgos(
+                OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT, 
+                OptimizationAlgorithm.LINE_GRADIENT_DESCENT);
+        config.setWeightInits(
+                WeightInit.XAVIER,
+                WeightInit.RELU, 
+                WeightInit.DISTRIBUTION, 
+                WeightInit.ZERO);
+        config.setUpdaters(
+                Updater.NONE, 
+                Updater.SGD, 
+                Updater.ADAM, 
+                Updater.ADAGRAD, 
+                Updater.ADADELTA);
         return ResponseEntity.ok(config);
     }
 
@@ -247,5 +262,4 @@ public class NeuralNetwork {
             }
         }
     }
-
 }

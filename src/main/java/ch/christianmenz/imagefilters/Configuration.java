@@ -28,7 +28,7 @@ public class Configuration {
         return weightInits;
     }
 
-    public void setWeightInits(WeightInit[] weightInits) {
+    public void setWeightInits(WeightInit... weightInits) {
         this.weightInits = weightInits;
     }
 
@@ -36,7 +36,7 @@ public class Configuration {
         return activations;
     }
 
-    public void setActivations(Activation[] activations) {
+    public void setActivations(Activation... activations) {
         this.activations = activations;
     }
 
@@ -44,7 +44,7 @@ public class Configuration {
         return optimizationAlgos;
     }
 
-    public void setOptimizationAlgos(OptimizationAlgorithm[] optimizationAlgos) {
+    public void setOptimizationAlgos(OptimizationAlgorithm... optimizationAlgos) {
         this.optimizationAlgos = optimizationAlgos;
     }
 
@@ -52,7 +52,7 @@ public class Configuration {
         return lossFunctions;
     }
 
-    public void setLossFunctions(LossFunctions.LossFunction[] lossFunctions) {
+    public void setLossFunctions(LossFunctions.LossFunction... lossFunctions) {
         this.lossFunctions = lossFunctions;
     }
 
@@ -60,7 +60,7 @@ public class Configuration {
         return updaters;
     }
 
-    public void setUpdaters(Updater[] updaters) {
+    public void setUpdaters(Updater... updaters) {
         this.updaters = updaters;
     }
 
