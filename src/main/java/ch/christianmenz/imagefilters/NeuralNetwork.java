@@ -99,22 +99,18 @@ public class NeuralNetwork {
         config.setActivations(
                 Activation.SIGMOID,
                 Activation.RELU, 
-                Activation.SOFTMAX, 
-                Activation.TANH);
+                Activation.SOFTMAX);
         config.setLossFunctions(
                 LossFunction.COSINE_PROXIMITY,
                 LossFunction.L1,
                 LossFunction.L2,
                 LossFunction.MEAN_ABSOLUTE_ERROR,
-                LossFunction.MSE,
-                LossFunction.NEGATIVELOGLIKELIHOOD);
+                LossFunction.MSE);
         config.setOptimizationAlgos(
                 OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT, 
                 OptimizationAlgorithm.LINE_GRADIENT_DESCENT);
         config.setWeightInits(
-                WeightInit.XAVIER,
-                WeightInit.RELU, 
-                WeightInit.DISTRIBUTION, 
+                WeightInit.XAVIER,                
                 WeightInit.ZERO);
         config.setUpdaters(
                 Updater.NONE, 
